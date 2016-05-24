@@ -1,0 +1,8 @@
+test:
+  cache:
+    paths:
+      - vendor/
+  script:
+    - COMPOSER_ROOT_VERSION=dev-master composer install
+    - cd tests
+    - ./run tap

@@ -1,0 +1,15 @@
+# B4nan test config file
+
+application:
+	scanDirs: false
+
+services:
+	- B4nan\Application\Parameters(@container::getParameters())
+
+console:
+	url: 'http://localhost'
+
+extensions:
+	console: Kdyby\Console\DI\ConsoleExtension
+	events: Kdyby\Events\DI\EventsExtension
+	annotations: Kdyby\Annotations\DI\AnnotationsExtension

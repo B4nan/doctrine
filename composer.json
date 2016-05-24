@@ -1,0 +1,46 @@
+{
+	"name": "b4nan/doctrine",
+	"type": "library",
+	"description": "doctrine",
+	"keywords": ["nette", "b4nan", "doctrine"],
+	"license": ["BSD-3-Clause", "GPL-2.0", "GPL-3.0"],
+	"authors": [
+		{
+			"name": "Martin Adámek",
+			"email": "martinadamek59@gmail.com"
+		}
+	],
+	"support": {
+		"email": "martinadamek59@gmail.com",
+		"issues": "https://github.com/B4nan/doctrine/issues"
+	},
+	"minimum-stability": "stable",
+	"require": {
+		"b4nan/utils": "dev-master",
+		"b4nan/translator": "dev-master",
+		"tracy/tracy": "2.3.*",
+		"kdyby/doctrine": "~3.0",
+		"nette/http": "2.3.*",
+		"nette/application": "2.3.*",
+		"nette/bootstrap": "2.3.*",
+		"nette/robot-loader": "2.3.*",
+		"nette/di": "2.3.*",
+		"nette/utils": "2.3.*"
+	},
+	"require-dev": {
+		"nette/tester": "@dev",
+		"kdyby/tester-extras": "@dev",
+		"jakub-onderka/php-parallel-lint": "0.*",
+		"jakub-onderka/php-console-highlighter": "0.*",
+		"mockery/mockery": "^0.9.4"
+	},
+	"autoload": {
+		"psr-4": {
+			"B4nan\\": "src/",
+			"B4nan\\Tests\\": "tests/"
+		}
+	},
+	"autoload-dev": {
+		"classmap": ["tests"]
+	}
+}
