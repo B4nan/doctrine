@@ -18,14 +18,14 @@
 	"require": {
 		"b4nan/utils": "dev-master",
 		"b4nan/translator": "dev-master",
-		"tracy/tracy": "2.3.*",
-		"kdyby/doctrine": "~3.0",
-		"nette/http": "2.3.*",
-		"nette/application": "2.3.*",
-		"nette/bootstrap": "2.3.*",
-		"nette/robot-loader": "2.3.*",
-		"nette/di": "2.3.*",
-		"nette/utils": "2.3.*"
+		"tracy/tracy": "^2.3",
+		"kdyby/doctrine": "^3.0",
+		"nette/http": "^2.3",
+		"nette/application": "^2.3",
+		"nette/bootstrap": "^2.3",
+		"nette/robot-loader": "^2.3",
+		"nette/di": "^2.3",
+		"nette/utils": "^2.3"
 	},
 	"require-dev": {
 		"nette/tester": "@dev",
