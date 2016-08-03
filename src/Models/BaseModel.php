@@ -2,11 +2,10 @@
 
 namespace B4nan\Models;
 
-use B4nan\Entities\BaseEntity;
 use B4nan\Application\Parameters;
+use B4nan\Entities\IEntity;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityNotFoundException;
-use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use InvalidArgumentException;
 use Kdyby\Doctrine\EntityDao;
@@ -89,7 +88,7 @@ abstract class BaseModel extends Object
 
 	/**
 	 * @param array|int $where
-	 * @return BaseEntity
+	 * @return IEntity
 	 * @throws EntityNotFoundException
 	 */
 	public function get($where)
@@ -103,7 +102,7 @@ abstract class BaseModel extends Object
 
 	/**
 	 * @param array|int $where
-	 * @return BaseEntity|NULL
+	 * @return IEntity|NULL
 	 */
 	public function find($where)
 	{
@@ -116,7 +115,7 @@ abstract class BaseModel extends Object
 	/**
 	 * @param int $id
 	 * @param null $class
-	 * @return BaseEntity reference proxy
+	 * @return IEntity reference proxy
 	 */
 	public function getReference($id, $class = NULL)
 	{
@@ -259,7 +258,7 @@ abstract class BaseModel extends Object
 
 				} elseif ($as !== '|') { // associative-array node
 					$key = $row->$as;
-					if ($key instanceof BaseEntity) {
+					if ($key instanceof IEntity) {
 						$key = $key->getId();
 					}
 					$x = & $x[$key];
@@ -279,16 +278,16 @@ abstract class BaseModel extends Object
 	/**
 	 * flush shortcut - sends queries
 	 *
-	 * @param BaseEntity $entity
+	 * @param IEntity $entity
 	 */
-	public function flush(BaseEntity $entity = NULL)
+	public function flush(IEntity $entity = NULL)
 	{
 		$this->getEm()->flush($entity);
 	}
 
 	/**
-	 * @param BaseEntity $entity
-	 * @param bool|BaseEntity $flush
+	 * @param IEntity $entity
+	 * @param bool|IEntity $flush
 	 * @return int entity id after flush
 	 */
 	public function persist($entity, $flush = TRUE)
@@ -305,7 +304,7 @@ abstract class BaseModel extends Object
 	}
 
 	/**
-	 * @param int|BaseEntity $entity
+	 * @param int|IEntity $entity
 	 * @param bool $flush
 	 * @return bool
 	 */
@@ -324,7 +323,7 @@ abstract class BaseModel extends Object
 	/**
 	 * @param array|ArrayHash $values
 	 * @param bool $returnEntity
-	 * @return int|BaseEntity
+	 * @return int|IEntity
 	 */
 	public function insert($values, $returnEntity = FALSE)
 	{
@@ -342,7 +341,7 @@ abstract class BaseModel extends Object
 	/**
 	 * @param array|ArrayHash $values
 	 * @param bool $flush
-	 * @return BaseEntity
+	 * @return IEntity
 	 * @throws EntityNotFoundException
 	 */
 	public function update($values, $flush = TRUE)
@@ -388,15 +387,15 @@ abstract class BaseModel extends Object
 	}
 
 	/**
-	 * @param BaseEntity   $entity
+	 * @param IEntity   $entity
 	 * @param \Traversable|array $values
 	 * @throws \Doctrine\ORM\ORMException
 	 */
-	public function fillEntityReferences(BaseEntity & $entity, $values)
+	public function fillEntityReferences(IEntity & $entity, $values)
 	{
 		$class = get_class($entity);
 		foreach ($values as $key => $value) {
-			if ($value instanceof BaseEntity) {
+			if ($value instanceof IEntity) {
 				continue;
 			}
 			$key = lcfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $key))));
@@ -431,13 +430,13 @@ abstract class BaseModel extends Object
 	}
 
 	/**
-	 * @param BaseEntity $entity
+	 * @param IEntity $entity
 	 * @param string $target
 	 * @param string $key
 	 * @param array $collection
 	 * @throws \Doctrine\ORM\ORMException
 	 */
-	protected function fillEntityCollection(BaseEntity & $entity, $target, $key, array $collection)
+	protected function fillEntityCollection(IEntity & $entity, $target, $key, array $collection)
 	{
 		foreach ($entity->$key as $ent) {
 			if (! in_array($ent->getId(), $collection)) {
@@ -446,7 +445,7 @@ abstract class BaseModel extends Object
 			}
 		}
 		foreach ($collection as $ent) {
-			if (! $ent instanceof BaseEntity) {
+			if (! $ent instanceof IEntity) {
 				$ent = $this->getEm()->getReference($target, $ent);
 			}
 			$fn = 'add' . ucfirst(substr($key, -1) === 's' ? substr($key, 0, substr($key, -1) === 'ies' ? -3 : -1) : $key);
@@ -457,14 +456,14 @@ abstract class BaseModel extends Object
 	/**
 	 * update Many to Many collection
 	 *
-	 * @param BaseEntity $entity
+	 * @param IEntity $entity
 	 * @param string $field collection identifier
 	 * @param array $collection collection values
 	 * @param string $class foreign entity
 	 */
-	public function setManyToMany(BaseEntity $entity, $field, array $collection, $class)
+	public function setManyToMany(IEntity $entity, $field, array $collection, $class)
 	{
-		/** @var BaseEntity $ent */
+		/** @var IEntity $ent */
 		foreach ($entity->$field as $ent) {
 			if (! in_array($ent->getId(), $collection)) {
 				$fn = 'remove' . ucfirst(substr($field, -1) === 's' ? substr($field, 0, substr($field, -1) === 'ies' ? -3 : -1) : $field);
@@ -483,13 +482,13 @@ abstract class BaseModel extends Object
 	/**
 	 * update entity collection
 	 *
-	 * @param BaseEntity $entity
+	 * @param IEntity $entity
 	 * @param string $field collection identifier
 	 * @param array $collection collection values
 	 * @param string $class foreign entity
 	 * @param string $type
 	 */
-	public function setCollection(BaseEntity $entity, $field, array $collection, $class, $type)
+	public function setCollection(IEntity $entity, $field, array $collection, $class, $type)
 	{
 		foreach ($collection as $key => $fields) {
 			if (! isset($entity->$field[$key])) {

@@ -11,7 +11,7 @@ use Nette\Utils\ArrayHash;
  * @property-read int $id
  * @author Martin Adámek <martinadamek59@gmail.com>
  */
-abstract class BaseEntity
+abstract class BaseEntity implements IEntity
 {
 
 	use MagicAccessors;
