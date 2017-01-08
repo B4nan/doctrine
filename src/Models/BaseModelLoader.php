@@ -55,7 +55,7 @@ class BaseModelLoader
 	 * getter for specified model
 	 *
 	 * @param string $name name of model
-	 * @return BaseModel
+	 * @return BaseRepository
 	 * @throws \InvalidArgumentException
 	 */
 	public function getModel($name)
@@ -71,7 +71,7 @@ class BaseModelLoader
 	 * shorthand for models
 	 *
 	 * @param string $name name of model
-	 * @return BaseModel
+	 * @return BaseRepository
 	 */
 	public function __get($name)
 	{

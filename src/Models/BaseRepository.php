@@ -4,20 +4,21 @@ namespace B4nan\Models;
 
 use B4nan\Application\Parameters;
 use B4nan\Entities\IEntity;
+use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\QueryBuilder;
 use InvalidArgumentException;
 use Kdyby\Doctrine\EntityDao;
 use Nette\InvalidStateException;
-use Nette\Object;
 use Nette\Utils\ArrayHash;
+use Nette\Utils\Arrays;
 use Nette\Utils\Strings;
 
 /**
  * @author Martin Adámek <martinadamek59@gmail.com>
  */
-abstract class BaseModel extends Object
+abstract class BaseRepository
 {
 
 	/** @var string full entity class name */
@@ -53,7 +54,7 @@ abstract class BaseModel extends Object
 
 	/**
 	 * @param string $entity
-	 * @return EntityDao
+	 * @return EntityDao|ObjectRepository
 	 */
 	public function getRepository($entity = NULL)
 	{
@@ -102,7 +103,7 @@ abstract class BaseModel extends Object
 
 	/**
 	 * @param array|int $where
-	 * @return IEntity|NULL
+	 * @return IEntity|object|NULL
 	 */
 	public function find($where)
 	{
@@ -115,7 +116,7 @@ abstract class BaseModel extends Object
 	/**
 	 * @param int $id
 	 * @param null $class
-	 * @return IEntity reference proxy
+	 * @return IEntity|object reference proxy
 	 */
 	public function getReference($id, $class = NULL)
 	{
@@ -201,78 +202,14 @@ abstract class BaseModel extends Object
 	 *   builds a tree:          $tree[$val1][$index][$val2]->col3[$val3] = {record}
 	 * - associative descriptor: col1|col2->col3=col4
 	 *   builds a tree:          $tree[$val1][$val2]->col3[$val3] = val4
+	 *
 	 * @param array $results
 	 * @param string $assoc associative $string descriptor
 	 * @return array
-	 * @author dg
 	 */
-	final public function fetchAssoc(array $results, $assoc)
+	final public function fetchAssoc(array $results, string $assoc)
 	{
-		$row = reset($results);
-		if (! $row) {
-			return [];  // empty result set
-		}
-		$row = (object) $row; // array hydration compatibility
-
-		$data = NULL;
-		$assoc = strtr($assoc, [ ',' => '|' ]);
-		$assoc = preg_split('#(\[\]|->|=|\|)#', $assoc, NULL, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
-
-		// check columns
-		foreach ($assoc as $as) {
-			if ($as !== '[]' && $as !== '=' && $as !== '->' && $as !== '|' && ! property_exists($row, $as)) {
-				throw new InvalidArgumentException("Unknown column '$as' in associative descriptor.");
-			}
-		}
-
-		if ($as === '->') { // must not be last
-			array_pop($assoc);
-		}
-
-		if (empty($assoc)) {
-			$assoc[] = '[]';
-		}
-
-		// make associative tree
-		do {
-			$row = (object) $row; // array hydration compatibility
-			$x = & $data;
-
-			// iterative deepening
-			foreach ($assoc as $i => $as) {
-				if ($as === '[]') { // indexed-array node
-					$x = & $x[];
-
-				} elseif ($as === '=') { // "value" node
-					$x = $row->{$assoc[$i + 1]};
-					continue 2;
-
-				} elseif ($as === '->') { // "object" node
-					if ($x === NULL) {
-						$x = clone $row;
-						$x = & $x->{$assoc[$i + 1]};
-						$x = NULL; // prepare child node
-					} else {
-						$x = & $x->{$assoc[$i + 1]};
-					}
-
-				} elseif ($as !== '|') { // associative-array node
-					$key = $row->$as;
-					if ($key instanceof IEntity) {
-						$key = $key->getId();
-					}
-					$x = & $x[$key];
-				}
-			}
-
-			if ($x === NULL) { // build leaf
-				$x = $row;
-			}
-
-		} while ($row = next($results));
-
-		unset($x);
-		return $data;
+		return Arrays::associate($results, $assoc);
 	}
 
 	/**
@@ -379,6 +316,10 @@ abstract class BaseModel extends Object
 
 		$ret = [];
 		foreach ($result as $res) {
+			if (is_array($res) && isset($res[0])) { // array result with extra variables
+				$res = $res[0] + $res;
+				unset($res[0]);
+			}
 			$k = is_array($res) ? $res[$key] : $res->$key;
 			$ret[$k] = $cb($res);
 		}

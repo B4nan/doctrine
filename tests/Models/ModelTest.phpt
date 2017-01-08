@@ -2,7 +2,7 @@
 
 namespace B4nan\Tests\Models;
 
-use B4nan\Models\BaseModel;
+use B4nan\Models\BaseRepository;
 use B4nan\Tests\TestCase;
 use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -212,7 +212,7 @@ class ModelTest extends TestCase
  * Class Logs
  * @package B4nan\Tests\Models
  */
-class Logs extends BaseModel
+class Logs extends BaseRepository
 {
 
 	/** @var string */

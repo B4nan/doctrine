@@ -28,7 +28,7 @@ abstract class EnumType extends Type
 	{
 		$values = array_map(function($val) {
 			return "'$val'";
-		}, static::$values);
+		}, array_keys(static::$values));
 
 		return sprintf("ENUM(%s) COMMENT '(DC2Type:%s)'", implode(', ', $values), $this->getName());
 	}
@@ -50,8 +50,9 @@ abstract class EnumType extends Type
 	 */
 	public function convertToDatabaseValue($value, AbstractPlatform $platform)
 	{
-		if (!in_array($value, static::$values)) {
-			throw new \InvalidArgumentException("Invalid '$this->name' value.");
+		if (! isset(static::$values[$value])) {
+			$name = $this->getName();
+			throw new \InvalidArgumentException("Invalid '$value' value for ENUM '$name'.");
 		}
 		return $value;
 	}
@@ -62,6 +63,19 @@ abstract class EnumType extends Type
 	public function getName()
 	{
 		return static::NAME;
+	}
+
+	/**
+	 * @param bool $prependNullValue
+	 * @return array
+	 */
+	public static function getPairs(bool $prependNullValue = FALSE) : array
+	{
+		$ret = static::$values;
+		if ($prependNullValue) {
+			$ret = [NULL => '–'] + $ret;
+		}
+		return $ret;
 	}
 
 }

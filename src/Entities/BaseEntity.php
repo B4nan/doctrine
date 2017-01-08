@@ -2,6 +2,7 @@
 
 namespace B4nan\Entities;
 
+use App\Entities\ArraySerializer;
 use B4nan\Utils\Common;
 use Doctrine\ORM\PersistentCollection;
 use Kdyby\Doctrine\Entities\MagicAccessors;
@@ -14,7 +15,7 @@ use Nette\Utils\ArrayHash;
 abstract class BaseEntity implements IEntity
 {
 
-	use MagicAccessors;
+	use MagicAccessors, ArraySerializer;
 
 	/** @var int */
 	protected $id;
@@ -63,50 +64,6 @@ abstract class BaseEntity implements IEntity
 	final public function getId()
 	{
 		return $this->id;
-	}
-
-	/**
-	 * @param bool $collectionKeys when field contains collection, return only array of PKs
-	 * @param bool $includeCollections
-	 * @param array $ignoreKeys
-	 * @return ArrayHash
-	 */
-	public function toArray($collectionKeys = TRUE, $includeCollections = TRUE, $ignoreKeys = [])
-	{
-		$ret = get_object_vars($this);
-		$unset = [];
-
-		if (method_exists($this, 'getId')) {
-			$ret['id'] = $this->getId();
-		}
-
-		foreach ($ret as $key => & $value) {
-			if (in_array($key, $ignoreKeys)) {
-				continue;
-			}
-			if ($value instanceof BaseEntity) {
-				$value = $value->getId();
-			} elseif ($value instanceof PersistentCollection) {
-				if ($includeCollections && $collectionKeys) {
-					$keys = [];
-					foreach ($value as $subEntity) {
-						$keys[] = $subEntity->getId();
-					}
-					$value = $keys;
-				} else {
-					$unset[] = $key;
-				}
-			}
-		}
-
-		if (! $includeCollections) {
-			foreach ($unset as $key) {
-				unset($ret[$key]);
-			}
-		}
-
-		$ret = Common::unsetKeys($ret, $ignoreKeys);
-		return ArrayHash::from($ret, FALSE);
 	}
 
 }
