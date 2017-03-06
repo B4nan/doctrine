@@ -2,11 +2,7 @@
 
 namespace B4nan\Entities;
 
-use App\Entities\ArraySerializer;
-use B4nan\Utils\Common;
-use Doctrine\ORM\PersistentCollection;
 use Kdyby\Doctrine\Entities\MagicAccessors;
-use Nette\Utils\ArrayHash;
 
 /**
  * @property-read int $id
